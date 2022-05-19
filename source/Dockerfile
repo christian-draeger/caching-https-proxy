@@ -1,7 +1,7 @@
 FROM nginxinc/nginx-unprivileged:1.21-alpine
 
 ENV EXTERNAL_HOST=github.com
-ENV PORT=80
+ENV PORT=8080
 ENV ROUTE="/"
 ENV CACHE_PATH="/tmp/cache"
 ENV CACHE_KEY_ZONE_SIZE=10m
