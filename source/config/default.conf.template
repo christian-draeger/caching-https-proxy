@@ -1,0 +1,35 @@
+proxy_cache_path            ${CACHE_PATH}
+                            levels=1:2
+                            keys_zone=STATIC:${CACHE_KEY_ZONE_SIZE}
+                            inactive=${CACHE_ENTRY_INACTIVE_TTL}
+                            max_size=${CACHE_MAX_SIZE};
+
+server {
+    listen                      ${PORT};
+    proxy_cache_bypass          $arg_nocache; # don't use cache on ?nocache=true query param
+    proxy_set_header            "User-Agent" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.133 Safari/537.36";
+    location ^~ ${ROUTE} {
+        # monitoring
+        stub_status;
+
+        # request
+        proxy_set_header            HOST ${EXTERNAL_HOST};
+        rewrite                     ^${ROUTE}(/.*)$ $1 break;
+        proxy_pass                  https://${EXTERNAL_HOST};
+
+        # cache
+        proxy_buffering             on;
+        proxy_cache                 STATIC;
+        proxy_cache_valid           200 ${CACHE_ENTRY_ACTIVE_TTL};
+        proxy_cache_use_stale       error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        add_header X-Proxy-Cache    $upstream_cache_status;
+
+        # modify external api response
+        proxy_ignore_headers        Cache-Control;
+        proxy_ignore_headers        Set-Cookie;
+        proxy_hide_header           X-Cache;
+        proxy_hide_header           Via;
+        proxy_hide_header           X-Powered-By;
+        proxy_hide_header           Age;
+    }
+}
