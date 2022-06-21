@@ -4,12 +4,12 @@
 
 tbd
 
-### How it works
+## How it works
 
 tbd
 
-### Usage
-#### Configuration via environment variables
+## Usage
+### Configuration via environment variables
 
 | **Env Var**              | **default value** | **description**                                                                                                                                                                                                                                                                                                                                                                                                               |
 |--------------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -22,11 +22,35 @@ tbd
 | CACHE_ENTRY_INACTIVE_TTL | 72h               | Evict least recently used entries (entries without a cache hit) after a given time.                                                                                                                                                                                                                                                                                                                                           |
 | CACHE_ENTRY_ACTIVE_TTL   | 30d               | Evict entries older than a given time.                                                                                                                                                                                                                                                                                                                                                                                        |
 
-### Deployment
+## Deployment
+### Docker
 
-tbd: want to provide helm chart to convenient deploy to k8s as well as heroku deployment.
+```shell
+docker pull draeger/caching-https-proxy
+docker run -p 8000:8080 draeger/caching-https-proxy
+```
 
-### Development
+### Kubernetes via Helm Chart
+Since the caching-https-proxy is based on nginx the caching-https-proxy provides a ready to use [helm chart](deployment/chart) that uses
+the [bitnami/nginx](https://artifacthub.io/packages/helm/bitnami/nginx) as a base chart.
+
+to deploy the caching-https-proxy directly to kubernetes using helm just run:
+
+```shell
+cd deployment/chart
+helm upgrade --install my-caching-https-proxy . -f ./values.yaml
+```
+
+to check what would be installed you can do a helm dry run that will print manifest to console out:
+```shell
+helm install my-caching-https-proxy ./deployment/chart --dry-run --debug
+```
+
+### Heroku
+
+tbd
+
+## Development
 
 To build the caching-https-proxy docker image on your local machine run following command from projects root:
 ```shell

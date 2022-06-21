@@ -1,0 +1,37 @@
+# this chart uses bitnami/nginx as base chart
+# see https://artifacthub.io/packages/helm/bitnami/nginx for all possible settings
+
+cachingHttpsProxy:
+  enabled: true
+  nameOverride: caching-https-proxy
+  image:
+    repository: draeger/caching-https-proxy
+    tag: 0.1
+  service:
+    type: ClusterIP
+    ports:
+      http: 8000
+      targetPort: 8080 # internal port
+  extraEnvVars:
+    - name: EXTERNAL_HOST
+      value: github.com
+    - name: ROUTE
+      value: /github
+    - name: CACHE_PATH
+      value: /tmp/github-cache
+    - name: CACHE_MAX_SIZE # persistent cache size @ $CACHE_PATH
+      value: 250m
+  extraVolumes:
+    - name: tmp
+      emptyDir: {}
+  extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
+  resources:
+    requests:
+      cpu: 5m
+      memory: 10Mi
+    limits:
+      cpu: 20m
+      memory: 50Mi
+
